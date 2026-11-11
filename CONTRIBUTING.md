@@ -6,7 +6,7 @@ says about Kubernetes or a DRA driver are all very welcome.
 
 ## Getting started
 
-You need Go 1.24 or newer and, for linting, [golangci-lint] v2.
+You need Go 1.26 or newer and, for linting, [golangci-lint] v2.
 
 ```console
 git clone https://github.com/cb-Sigma/dra-migrate.git

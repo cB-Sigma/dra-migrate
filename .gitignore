@@ -1,0 +1,18 @@
+# Binaries
+/dra-migrate
+/kubectl-dra_migrate
+/bin/
+/dist/
+*.exe
+*.test
+
+# Coverage and profiles
+coverage.out
+coverage.html
+*.prof
+
+# Editors and OS
+.idea/
+.vscode/
+*.swp
+.DS_Store

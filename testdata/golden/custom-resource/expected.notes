@@ -1,0 +1,3 @@
+input.yaml:1: warning: PyTorchJob/bert: pod template inside custom resource PyTorchJob was found by structure; verify that its CRD schema preserves resourceClaims and resources.claims
+dra-migrate: rewrote 2 container(s) in 1 file(s), generated 2 ResourceClaimTemplate(s) (resource.k8s.io/v1)
+dra-migrate: review the result before applying it; run `dra-migrate explain` for what changed and `dra-migrate cluster` to check that the cluster is ready

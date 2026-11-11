@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: transcoder
+spec:
+  selector:
+    matchLabels:
+      app: transcoder
+  template:
+    metadata:
+      labels:
+        app: transcoder
+    spec:
+      containers:
+      - name: ffmpeg
+        image: registry.example.com/media/ffmpeg:7
+        resources:
+          limits:
+            gpu.intel.com/i915: 1
+            example.com/fpga-arria10: 2
+            nvidia.com/gpu: 1

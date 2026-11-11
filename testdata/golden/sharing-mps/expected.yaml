@@ -1,0 +1,68 @@
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: mps-gpu-shared
+spec:
+  spec:
+    devices:
+      requests:
+      - name: gpu
+        exactly:
+          deviceClassName: gpu.nvidia.com
+      config:
+      - requests:
+        - gpu
+        opaque:
+          driver: gpu.nvidia.com
+          parameters:
+            apiVersion: resource.nvidia.com/v1beta1
+            kind: GpuConfig
+            sharing:
+              strategy: MPS
+---
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: mps-mig-1g-5gb-shared
+spec:
+  spec:
+    devices:
+      requests:
+      - name: mig
+        exactly:
+          deviceClassName: mig.nvidia.com
+          selectors:
+          - cel:
+              expression: device.attributes['gpu.nvidia.com'].profile == '1g.5gb'
+      config:
+      - requests:
+        - mig
+        opaque:
+          driver: gpu.nvidia.com
+          parameters:
+            apiVersion: resource.nvidia.com/v1beta1
+            kind: MigDeviceConfig
+            sharing:
+              strategy: MPS
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mps
+spec:
+  containers:
+  - name: a
+    image: registry.example.com/app:1
+    resources:
+      claims:
+      - name: gpu-shared
+  - name: b
+    image: registry.example.com/app:1
+    resources:
+      claims:
+      - name: mig-1g-5gb-shared
+  resourceClaims:
+  - name: gpu-shared
+    resourceClaimTemplateName: mps-gpu-shared
+  - name: mig-1g-5gb-shared
+    resourceClaimTemplateName: mps-mig-1g-5gb-shared

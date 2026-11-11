@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: legacy-cluster
+  namespace: research
+spec:
+  nodeSelector:
+    nvidia.com/gpu.memory: "40960"
+    nvidia.com/gpu.family: ampere
+  containers:
+  - name: main
+    image: registry.example.com/app:1
+    resources:
+      limits:
+        nvidia.com/gpu: 2
+        nvidia.com/mig-3g.20gb: 1

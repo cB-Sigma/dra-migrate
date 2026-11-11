@@ -1,0 +1,48 @@
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: inference-gpu
+spec:
+  spec:
+    devices:
+      requests:
+      - name: gpu
+        exactly:
+          deviceClassName: gpu.nvidia.com
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: inference
+spec:
+  serviceName: inference
+  replicas: 3
+  selector:
+    matchLabels: {app: inference}
+  template:
+    metadata:
+      labels: {app: inference}
+    spec:
+      containers:
+      - name: server
+        image: registry.example.com/inference/server:2.1
+        ports:
+        - containerPort: 8000
+        resources:
+          limits:
+            memory: 16Gi
+          claims:
+          - name: gpu
+      - name: embedder
+        image: registry.example.com/inference/embedder:2.1
+        resources:
+          claims:
+          - name: gpu
+      - name: metrics
+        image: registry.example.com/inference/exporter:0.9
+        resources:
+          limits:
+            cpu: 100m
+      resourceClaims:
+      - name: gpu
+        resourceClaimTemplateName: inference-gpu

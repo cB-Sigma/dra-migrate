@@ -1,0 +1,38 @@
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: batch-gpu
+spec:
+  spec:
+    devices:
+      requests:
+      - name: gpu
+        exactly:
+          deviceClassName: gpu.nvidia.com
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: batch
+spec:
+  initContainers:
+  - name: warmup
+    image: registry.example.com/warmup:1
+    resources:
+      claims:
+      - name: gpu
+  - name: gpu-exporter
+    image: registry.example.com/exporter:1
+    restartPolicy: Always
+    resources:
+      claims:
+      - name: gpu
+  containers:
+  - name: main
+    image: registry.example.com/app:1
+    resources:
+      limits:
+        nvidia.com/gpu: 0
+  resourceClaims:
+  - name: gpu
+    resourceClaimTemplateName: batch-gpu

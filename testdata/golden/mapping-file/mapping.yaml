@@ -1,0 +1,23 @@
+# Custom mappings take precedence over the built-in NVIDIA rules.
+mappings:
+- resource: gpu.intel.com/i915
+  deviceClass: gpu.intel.com
+  claimName: igpu
+  requestName: gpu
+- resource: example.com/fpga-*
+  deviceClass: fpga.example.com
+  selectors:
+  - device.attributes['fpga.example.com'].family == 'arria10'
+  config:
+    driver: fpga.example.com
+    parameters:
+      apiVersion: fpga.example.com/v1
+      kind: FpgaConfig
+      bitstream: transcode-v2
+- resource: nvidia.com/gpu
+  deviceClass: gpu.nvidia.com
+  claimName: gpu
+  selectors:
+  - device.capacity['gpu.nvidia.com'].memory.compareTo(quantity('24Gi')) >= 0
+  notes:
+  - "site policy: transcoding needs at least 24Gi of GPU memory"

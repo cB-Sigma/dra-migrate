@@ -1,0 +1,58 @@
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: bert-gpu
+spec:
+  spec:
+    devices:
+      requests:
+      - name: gpu
+        exactly:
+          deviceClassName: gpu.nvidia.com
+---
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: bert-gpu-2
+spec:
+  spec:
+    devices:
+      requests:
+      - name: gpu
+        exactly:
+          deviceClassName: gpu.nvidia.com
+          allocationMode: ExactCount
+          count: 2
+---
+apiVersion: kubeflow.org/v1
+kind: PyTorchJob
+metadata:
+  name: bert
+spec:
+  pytorchReplicaSpecs:
+    Master:
+      replicas: 1
+      template:
+        spec:
+          containers:
+          - name: pytorch
+            image: registry.example.com/bert:1
+            resources:
+              claims:
+              - name: gpu
+          resourceClaims:
+          - name: gpu
+            resourceClaimTemplateName: bert-gpu
+    Worker:
+      replicas: 4
+      template:
+        spec:
+          containers:
+          - name: pytorch
+            image: registry.example.com/bert:1
+            resources:
+              claims:
+              - name: gpu
+          resourceClaims:
+          - name: gpu
+            resourceClaimTemplateName: bert-gpu-2

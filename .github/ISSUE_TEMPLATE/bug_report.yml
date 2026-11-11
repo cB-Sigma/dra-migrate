@@ -1,0 +1,45 @@
+name: Bug report
+description: dra-migrate produced wrong output, a wrong finding, or crashed
+labels: [bug]
+body:
+  - type: textarea
+    id: input
+    attributes:
+      label: Input manifest
+      description: The smallest manifest that reproduces the problem. Remove anything confidential.
+      render: yaml
+    validations:
+      required: true
+  - type: input
+    id: command
+    attributes:
+      label: Command
+      placeholder: dra-migrate convert --diff pod.yaml
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened
+      description: Output of the command, including anything printed to stderr.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: dra-migrate version
+      description: Output of `dra-migrate version`
+    validations:
+      required: true
+  - type: input
+    id: cluster
+    attributes:
+      label: Kubernetes and DRA driver version (if relevant)
+      placeholder: Kubernetes 1.34.2, dra-driver-nvidia-gpu 0.5.1

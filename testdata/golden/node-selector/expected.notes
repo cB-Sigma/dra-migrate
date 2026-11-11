@@ -1,0 +1,3 @@
+input.yaml:7: warning: Pod/a100-job: nodeSelector nvidia.com/gpu.product=A100-SXM4-40GB became CEL selector "device.attributes['gpu.nvidia.com'].productName.lowerAscii().matches('a100[ -]sxm4[ -]40gb')"; GFD label values and DRA device attributes are not guaranteed to match, compare with `kubectl get resourceslices -o yaml`
+dra-migrate: rewrote 1 container(s) in 1 file(s), generated 1 ResourceClaimTemplate(s) (resource.k8s.io/v1)
+dra-migrate: review the result before applying it; run `dra-migrate explain` for what changed and `dra-migrate cluster` to check that the cluster is ready

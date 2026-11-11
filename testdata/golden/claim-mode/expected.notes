@@ -1,0 +1,3 @@
+input.yaml:19: warning: Deployment/dev-shell: nvidia.com/gpu.shared was oversubscribed by the device plugin; all pods now share the device(s) of ResourceClaim dev-shell-gpu-shared; no sharing configuration was added (see --sharing)
+dra-migrate: rewrote 1 container(s) in 1 file(s), generated 1 ResourceClaim(s) (resource.k8s.io/v1)
+dra-migrate: review the result before applying it; run `dra-migrate explain` for what changed and `dra-migrate cluster` to check that the cluster is ready

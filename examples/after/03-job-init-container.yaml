@@ -1,0 +1,42 @@
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: finetune-gpu
+spec:
+  spec:
+    devices:
+      requests:
+      - name: gpu
+        exactly:
+          deviceClassName: gpu.nvidia.com
+          allocationMode: ExactCount
+          count: 2
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: finetune
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      initContainers:
+      # Fails fast when the driver is broken on the node.
+      - name: gpu-check
+        image: nvcr.io/nvidia/cuda:12.5.0-base-ubuntu22.04
+        command: ["nvidia-smi"]
+        resources:
+          claims:
+          - name: gpu
+      - name: fetch-weights
+        image: registry.example.com/tools/fetch:3
+      containers:
+      - name: finetune
+        image: registry.example.com/ml/finetune:0.7
+        resources:
+          claims:
+          - name: gpu
+      resourceClaims:
+      - name: gpu
+        resourceClaimTemplateName: finetune-gpu

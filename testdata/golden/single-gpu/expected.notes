@@ -1,0 +1,2 @@
+dra-migrate: rewrote 1 container(s) in 1 file(s), generated 1 ResourceClaimTemplate(s) (resource.k8s.io/v1)
+dra-migrate: review the result before applying it; run `dra-migrate explain` for what changed and `dra-migrate cluster` to check that the cluster is ready

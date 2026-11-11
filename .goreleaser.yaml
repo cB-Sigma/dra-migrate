@@ -1,0 +1,88 @@
+version: 2
+
+project_name: dra-migrate
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: dra-migrate
+    main: ./cmd/dra-migrate
+    binary: dra-migrate
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X github.com/cb-Sigma/dra-migrate/internal/version.Version={{ .Version }}
+      - -X github.com/cb-Sigma/dra-migrate/internal/version.Commit={{ .ShortCommit }}
+      - -X github.com/cb-Sigma/dra-migrate/internal/version.Date={{ .CommitDate }}
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - id: default
+    formats: [tar.gz]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files:
+      - LICENSE
+      - README.md
+
+checksum:
+  name_template: checksums.txt
+
+dockers:
+  - image_templates:
+      - "ghcr.io/cb-sigma/dra-migrate:{{ .Version }}-amd64"
+    use: buildx
+    goarch: amd64
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.source=https://github.com/cb-Sigma/dra-migrate"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.licenses=Apache-2.0"
+  - image_templates:
+      - "ghcr.io/cb-sigma/dra-migrate:{{ .Version }}-arm64"
+    use: buildx
+    goarch: arm64
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--platform=linux/arm64"
+      - "--label=org.opencontainers.image.source=https://github.com/cb-Sigma/dra-migrate"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.licenses=Apache-2.0"
+
+docker_manifests:
+  - name_template: "ghcr.io/cb-sigma/dra-migrate:{{ .Version }}"
+    image_templates:
+      - "ghcr.io/cb-sigma/dra-migrate:{{ .Version }}-amd64"
+      - "ghcr.io/cb-sigma/dra-migrate:{{ .Version }}-arm64"
+  - name_template: "ghcr.io/cb-sigma/dra-migrate:latest"
+    image_templates:
+      - "ghcr.io/cb-sigma/dra-migrate:{{ .Version }}-amd64"
+      - "ghcr.io/cb-sigma/dra-migrate:{{ .Version }}-arm64"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
+
+release:
+  prerelease: auto

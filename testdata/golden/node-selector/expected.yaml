@@ -1,0 +1,31 @@
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: a100-job-gpu
+spec:
+  spec:
+    devices:
+      requests:
+      - name: gpu
+        exactly:
+          deviceClassName: gpu.nvidia.com
+          selectors:
+          - cel:
+              expression: device.attributes['gpu.nvidia.com'].productName.lowerAscii().matches('a100[ -]sxm4[ -]40gb')
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: a100-job
+spec:
+  nodeSelector:
+    topology.kubernetes.io/zone: us-east1-b
+  containers:
+  - name: main
+    image: registry.example.com/app:1
+    resources:
+      claims:
+      - name: gpu
+  resourceClaims:
+  - name: gpu
+    resourceClaimTemplateName: a100-job-gpu

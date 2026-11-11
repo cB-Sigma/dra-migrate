@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: a100-job
+spec:
+  nodeSelector:
+    nvidia.com/gpu.product: A100-SXM4-40GB
+    topology.kubernetes.io/zone: us-east1-b
+  containers:
+  - name: main
+    image: registry.example.com/app:1
+    resources:
+      limits:
+        nvidia.com/gpu: 1

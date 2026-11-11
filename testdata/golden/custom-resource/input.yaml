@@ -1,0 +1,26 @@
+apiVersion: kubeflow.org/v1
+kind: PyTorchJob
+metadata:
+  name: bert
+spec:
+  pytorchReplicaSpecs:
+    Master:
+      replicas: 1
+      template:
+        spec:
+          containers:
+          - name: pytorch
+            image: registry.example.com/bert:1
+            resources:
+              limits:
+                nvidia.com/gpu: 1
+    Worker:
+      replicas: 4
+      template:
+        spec:
+          containers:
+          - name: pytorch
+            image: registry.example.com/bert:1
+            resources:
+              limits:
+                nvidia.com/gpu: 2

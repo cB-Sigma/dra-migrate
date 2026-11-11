@@ -1,0 +1,56 @@
+apiVersion: resource.k8s.io/v1beta2
+kind: ResourceClaimTemplate
+metadata:
+  name: legacy-cluster-gpu
+  namespace: research
+spec:
+  spec:
+    devices:
+      requests:
+      - name: gpu
+        exactly:
+          deviceClassName: gpu.nvidia.com
+          allocationMode: ExactCount
+          count: 2
+          selectors:
+          - cel:
+              expression: device.capacity['gpu.nvidia.com'].memory.compareTo(quantity('40960Mi')) >= 0
+          - cel:
+              expression: device.attributes['gpu.nvidia.com'].architecture.lowerAscii() == 'ampere'
+---
+apiVersion: resource.k8s.io/v1beta2
+kind: ResourceClaimTemplate
+metadata:
+  name: legacy-cluster-mig-3g-20gb
+  namespace: research
+spec:
+  spec:
+    devices:
+      requests:
+      - name: mig
+        exactly:
+          deviceClassName: mig.nvidia.com
+          selectors:
+          - cel:
+              expression: device.attributes['gpu.nvidia.com'].profile == '3g.20gb'
+          - cel:
+              expression: device.attributes['gpu.nvidia.com'].architecture.lowerAscii() == 'ampere'
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: legacy-cluster
+  namespace: research
+spec:
+  containers:
+  - name: main
+    image: registry.example.com/app:1
+    resources:
+      claims:
+      - name: gpu
+      - name: mig-3g-20gb
+  resourceClaims:
+  - name: gpu
+    resourceClaimTemplateName: legacy-cluster-gpu
+  - name: mig-3g-20gb
+    resourceClaimTemplateName: legacy-cluster-mig-3g-20gb

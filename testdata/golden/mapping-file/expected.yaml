@@ -1,0 +1,81 @@
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: transcoder-igpu
+spec:
+  spec:
+    devices:
+      requests:
+      - name: gpu
+        exactly:
+          deviceClassName: gpu.intel.com
+---
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: transcoder-fpga-arria10
+spec:
+  spec:
+    devices:
+      requests:
+      - name: fpga-arria10
+        exactly:
+          deviceClassName: fpga.example.com
+          allocationMode: ExactCount
+          count: 2
+          selectors:
+          - cel:
+              expression: device.attributes['fpga.example.com'].family == 'arria10'
+      config:
+      - requests:
+        - fpga-arria10
+        opaque:
+          driver: fpga.example.com
+          parameters:
+            apiVersion: fpga.example.com/v1
+            kind: FpgaConfig
+            bitstream: transcode-v2
+---
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: transcoder-gpu
+spec:
+  spec:
+    devices:
+      requests:
+      - name: gpu
+        exactly:
+          deviceClassName: gpu.nvidia.com
+          selectors:
+          - cel:
+              expression: device.capacity['gpu.nvidia.com'].memory.compareTo(quantity('24Gi')) >= 0
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: transcoder
+spec:
+  selector:
+    matchLabels:
+      app: transcoder
+  template:
+    metadata:
+      labels:
+        app: transcoder
+    spec:
+      containers:
+      - name: ffmpeg
+        image: registry.example.com/media/ffmpeg:7
+        resources:
+          claims:
+          - name: igpu
+          - name: fpga-arria10
+          - name: gpu
+      resourceClaims:
+      - name: igpu
+        resourceClaimTemplateName: transcoder-igpu
+      - name: fpga-arria10
+        resourceClaimTemplateName: transcoder-fpga-arria10
+      - name: gpu
+        resourceClaimTemplateName: transcoder-gpu

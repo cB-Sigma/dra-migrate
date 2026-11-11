@@ -1,0 +1,90 @@
+# Inference stack.
+# Owner: platform-ml
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: triton-config
+data:
+  # Go templates in data must survive untouched.
+  banner.tmpl: |
+    {{ if .Ready }}ready{{ end }}
+    ---
+    not a document separator
+---
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: triton-gpu
+spec:
+  spec:
+    devices:
+      requests:
+      - name: gpu
+        exactly:
+          deviceClassName: gpu.nvidia.com
+---
+# The model server. Keep this comment.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: triton
+spec:
+  selector:
+    matchLabels:
+      app: triton
+  template:
+    metadata:
+      labels:
+        app: triton
+    spec:
+      containers:
+      - name: triton
+        image: nvcr.io/nvidia/tritonserver:24.05-py3   # pinned, see PLAT-1234
+
+        resources:
+          limits:
+            cpu: "4"
+          requests:
+            cpu: "2"
+          claims:
+          # One full GPU per replica.
+          - name: gpu
+        env:
+        - name: MODEL_REPO
+          value: 's3://models/prod'
+
+      # GPU nodes are tainted.
+      tolerations:
+      - key: nvidia.com/gpu
+        operator: Exists
+      resourceClaims:
+      - name: gpu
+        resourceClaimTemplateName: triton-gpu
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: triton
+spec:
+  selector:
+    app: triton
+  ports:
+  - port: 8000
+---
+# A CPU-only worker: must not change.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: preprocess
+spec:
+  selector:
+    matchLabels: {app: preprocess}
+  template:
+    metadata:
+      labels: {app: preprocess}
+    spec:
+      containers:
+      - name: worker
+        image: registry.example.com/preprocess:5
+        resources: {limits: {cpu: "1"}}

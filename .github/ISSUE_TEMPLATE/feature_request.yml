@@ -1,0 +1,23 @@
+name: Feature request
+description: Suggest a new rule, mapping, flag or output format
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to migrate?
+      description: Describe the workloads, resource names and drivers involved.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What should dra-migrate do?
+      description: If possible, show the input manifest and the output you would like to get.
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Links to driver documentation, KEPs or API references that define the expected behaviour.

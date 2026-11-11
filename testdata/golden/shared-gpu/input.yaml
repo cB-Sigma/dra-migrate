@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dev-shell
+spec:
+  selector:
+    matchLabels:
+      app: dev-shell
+  template:
+    metadata:
+      labels:
+        app: dev-shell
+    spec:
+      containers:
+      - name: shell
+        image: registry.example.com/dev/shell:1
+        resources:
+          limits:
+            nvidia.com/gpu.shared: 1

@@ -1,0 +1,3 @@
+input.yaml:22: info: StatefulSet/inference: containers server, embedder share claim "gpu" (1 device(s)); with the device plugin each had its own
+dra-migrate: rewrote 2 container(s) in 1 file(s), generated 1 ResourceClaimTemplate(s) (resource.k8s.io/v1)
+dra-migrate: review the result before applying it; run `dra-migrate explain` for what changed and `dra-migrate cluster` to check that the cluster is ready

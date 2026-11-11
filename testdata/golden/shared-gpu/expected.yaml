@@ -1,0 +1,34 @@
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: dev-shell-gpu-shared
+spec:
+  spec:
+    devices:
+      requests:
+      - name: gpu
+        exactly:
+          deviceClassName: gpu.nvidia.com
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dev-shell
+spec:
+  selector:
+    matchLabels:
+      app: dev-shell
+  template:
+    metadata:
+      labels:
+        app: dev-shell
+    spec:
+      containers:
+      - name: shell
+        image: registry.example.com/dev/shell:1
+        resources:
+          claims:
+          - name: gpu-shared
+      resourceClaims:
+      - name: gpu-shared
+        resourceClaimTemplateName: dev-shell-gpu-shared

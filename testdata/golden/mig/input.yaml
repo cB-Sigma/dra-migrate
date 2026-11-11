@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notebook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notebook
+  template:
+    metadata:
+      labels:
+        app: notebook
+    spec:
+      containers:
+      - name: jupyter
+        image: quay.io/jupyter/pytorch-notebook:cuda12-latest
+        resources:
+          limits:
+            nvidia.com/mig-1g.10gb: 1

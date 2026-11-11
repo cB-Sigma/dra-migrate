@@ -1,0 +1,31 @@
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: partly-migrated-gpu
+spec:
+  spec:
+    devices:
+      requests:
+      - name: gpu
+        exactly:
+          deviceClassName: gpu.nvidia.com
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: partly-migrated
+spec:
+  containers:
+  - name: main
+    image: registry.example.com/app:1
+    resources:
+      claims:
+      - name: gpu
+      - name: gpu-2
+      limits:
+        cpu: "1"
+  resourceClaims:
+  - name: gpu
+    resourceClaimTemplateName: some-other-template
+  - name: gpu-2
+    resourceClaimTemplateName: partly-migrated-gpu

@@ -1,0 +1,15 @@
+- id: dra-migrate-lint
+  name: dra-migrate lint
+  description: Fail when Kubernetes manifests still request GPUs through device-plugin extended resources.
+  entry: dra-migrate lint
+  language: golang
+  types: [yaml]
+  require_serial: true
+
+- id: dra-migrate-convert
+  name: dra-migrate convert
+  description: Rewrite device-plugin GPU requests in Kubernetes manifests to DRA resource claims, in place.
+  entry: dra-migrate convert --in-place --quiet
+  language: golang
+  types: [yaml]
+  require_serial: true

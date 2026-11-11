@@ -1,0 +1,43 @@
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaim
+metadata:
+  name: dev-shell-gpu-shared
+spec:
+  devices:
+    requests:
+    - name: gpu
+      exactly:
+        deviceClassName: gpu.nvidia.com
+    config:
+    - requests:
+      - gpu
+      opaque:
+        driver: gpu.nvidia.com
+        parameters:
+          apiVersion: resource.nvidia.com/v1beta1
+          kind: GpuConfig
+          sharing:
+            strategy: TimeSlicing
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dev-shell
+spec:
+  selector:
+    matchLabels:
+      app: dev-shell
+  template:
+    metadata:
+      labels:
+        app: dev-shell
+    spec:
+      containers:
+      - name: shell
+        image: registry.example.com/dev/shell:1
+        resources:
+          claims:
+          - name: gpu-shared
+      resourceClaims:
+      - name: gpu-shared
+        resourceClaimName: dev-shell-gpu-shared

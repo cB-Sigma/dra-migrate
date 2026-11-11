@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: finetune
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      initContainers:
+      # Fails fast when the driver is broken on the node.
+      - name: gpu-check
+        image: nvcr.io/nvidia/cuda:12.5.0-base-ubuntu22.04
+        command: ["nvidia-smi"]
+        resources:
+          limits:
+            nvidia.com/gpu: 1
+      - name: fetch-weights
+        image: registry.example.com/tools/fetch:3
+      containers:
+      - name: finetune
+        image: registry.example.com/ml/finetune:0.7
+        resources:
+          limits:
+            nvidia.com/gpu: 2
